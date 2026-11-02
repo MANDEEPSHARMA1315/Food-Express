@@ -1,0 +1,147 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<main class="py-5">
+  <div class="container">
+    <!-- Page Header & Search Bar -->
+    <div class="row align-items-center mb-4 g-3">
+      <div class="col-lg-6">
+        <span class="text-primary fw-bold small text-uppercase">Curated Culinary Catalog</span>
+        <h1 class="h2 fw-bold mb-1">Our Gourmet Menu</h1>
+        <p class="text-muted mb-0">Browse through our chef-crafted recipes prepared with fresh ingredients.</p>
+      </div>
+
+      <div class="col-lg-6">
+        <form action="/menu" method="GET" class="d-flex gap-2" id="menuFilterForm">
+          <!-- Preserve category if selected -->
+          <% if (currentCategory && currentCategory !== 'all') { %>
+            <input type="hidden" name="category" value="<%= currentCategory %>">
+          <% } %>
+
+          <div class="search-input-group flex-grow-1">
+            <i class="bi bi-search search-icon-inside"></i>
+            <input type="text" name="search" class="form-control py-2" placeholder="Search food by name, ingredients..." value="<%= searchQuery %>" id="menuSearchInput">
+          </div>
+          <button type="submit" class="btn btn-primary-custom py-2 px-3">
+            Search
+          </button>
+          <% if (searchQuery || currentCategory !== 'all' || selectedDiet !== 'all') { %>
+            <a href="/menu" class="btn btn-outline-secondary rounded-pill py-2 px-3" title="Clear Filters">
+              <i class="bi bi-x-lg"></i>
+            </a>
+          <% } %>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Pills & Dietary Filter -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 bg-white rounded-4 border mb-4 shadow-sm">
+      <!-- Category Tabs -->
+      <div class="d-flex flex-wrap gap-2">
+        <% categories.forEach(cat => { %>
+          <a href="/menu?category=<%= cat.slug %><%= searchQuery ? '&search=' + searchQuery : '' %><%= selectedDiet !== 'all' ? '&diet=' + selectedDiet : '' %>"
+             class="btn btn-sm rounded-pill px-3 py-2 fw-semibold <%= currentCategory === cat.slug ? 'btn-danger text-white' : 'btn-light text-dark' %>"
+             id="filterCat-<%= cat.slug %>">
+            <i class="bi <%= cat.icon %> me-1"></i> <%= cat.name %>
+          </a>
+        <% }) %>
+      </div>
+
+      <!-- Diet Filter: All / Veg / Non-Veg -->
+      <div class="btn-group btn-group-sm" role="group" aria-label="Diet Filter">
+        <a href="/menu?category=<%= currentCategory %><%= searchQuery ? '&search=' + searchQuery : '' %>&diet=all" 
+           class="btn <%= selectedDiet === 'all' ? 'btn-dark' : 'btn-outline-dark' %>">All</a>
+        <a href="/menu?category=<%= currentCategory %><%= searchQuery ? '&search=' + searchQuery : '' %>&diet=veg" 
+           class="btn <%= selectedDiet === 'veg' ? 'btn-success' : 'btn-outline-success' %>">
+          <i class="bi bi-circle-fill small me-1"></i> Veg Only
+        </a>
+        <a href="/menu?category=<%= currentCategory %><%= searchQuery ? '&search=' + searchQuery : '' %>&diet=non-veg" 
+           class="btn <%= selectedDiet === 'non-veg' ? 'btn-danger' : 'btn-outline-danger' %>">
+          <i class="bi bi-triangle-fill small me-1"></i> Non-Veg
+        </a>
+      </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <span class="text-muted small">
+        Showing <strong><%= foods.length %></strong> appetizing options
+        <% if (searchQuery) { %> for "<%= searchQuery %>"<% } %>
+      </span>
+      <span class="badge bg-light text-dark border">Estimated Prep: 20-30 mins</span>
+    </div>
+
+    <!-- Foods Grid -->
+    <% if (foods.length === 0) { %>
+      <div class="text-center py-5 bg-white rounded-4 border my-4">
+        <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+        <h3 class="fw-bold">No dishes found</h3>
+        <p class="text-muted">We couldn't find any food items matching your search criteria.</p>
+        <a href="/menu" class="btn btn-primary-custom mt-2">Reset All Filters</a>
+      </div>
+    <% } else { %>
+      <div class="row g-4">
+        <% foods.forEach(food => { %>
+          <div class="col-lg-3 col-md-6">
+            <div class="food-card" id="foodCard-<%= food.id %>">
+              <div class="food-img-container">
+                <img src="<%= food.image %>" alt="<%= food.name %>" class="food-card-img" loading="lazy">
+                <div class="food-badges-top">
+                  <span class="badge-pill-blur">
+                    <i class="bi bi-star-fill text-warning"></i> <%= food.rating %>
+                  </span>
+                  <% if (food.isPopular) { %>
+                    <span class="badge-popular"><i class="bi bi-fire"></i> Hot</span>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="food-card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-muted small fw-medium"><%= food.category %></span>
+                  <span class="badge-diet <%= food.isVeg ? 'badge-veg' : 'badge-non-veg' %>" title="<%= food.isVeg ? 'Vegetarian' : 'Non-Vegetarian' %>">
+                    <% if (food.isVeg) { %>
+                      <span class="badge-veg-circle"></span>
+                    <% } else { %>
+                      <span class="badge-non-veg-triangle"></span>
+                    <% } %>
+                  </span>
+                </div>
+
+                <h3 class="food-title fs-6">
+                  <a href="/food/<%= food.id %>" class="text-dark text-decoration-none"><%= food.name %></a>
+                </h3>
+                <p class="food-desc small text-muted"><%= food.description %></p>
+
+                <div class="food-meta small">
+                  <span><i class="bi bi-stopwatch text-primary"></i> <%= food.deliveryTime %></span>
+                  <span>•</span>
+                  <span><%= food.calories %></span>
+                </div>
+
+                <div class="food-footer">
+                  <div class="food-price fs-5">
+                    ₹<%= food.price %>
+                    <% if (food.originalPrice) { %>
+                      <span class="original">₹<%= food.originalPrice %></span>
+                    <% } %>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="/food/<%= food.id %>" class="btn btn-sm btn-light border rounded-pill px-2" title="Details">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <button class="btn-add-cart" data-food-id="<%= food.id %>" data-food-name="<%= food.name %>" title="Add to Cart">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

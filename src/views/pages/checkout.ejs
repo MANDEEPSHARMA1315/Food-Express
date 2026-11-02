@@ -1,0 +1,166 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<main class="py-5">
+  <div class="container">
+    <div class="mb-4">
+      <h1 class="h2 fw-bold mb-1">Checkout</h1>
+      <p class="text-muted mb-0">Provide delivery details and choose your preferred payment method.</p>
+    </div>
+
+    <%- include('../partials/alerts') %>
+
+    <form action="/checkout" method="POST" id="checkoutForm">
+      <div class="row g-4">
+        <!-- Left Column: Delivery & Payment Details -->
+        <div class="col-lg-8">
+          <!-- 1. Delivery Information Card -->
+          <div class="card border rounded-4 shadow-sm p-4 mb-4">
+            <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+              <span class="badge bg-danger rounded-circle p-2 fs-6">1</span> Delivery Address
+            </h4>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="fullName" class="form-label fw-semibold">Full Name</label>
+                <input type="text" class="form-control" id="fullName" name="name" value="<%= user ? user.name : 'Akant Sharma' %>" required>
+              </div>
+
+              <div class="col-md-6">
+                <label for="phoneNumber" class="form-label fw-semibold">Phone Number</label>
+                <input type="tel" class="form-control" id="phoneNumber" name="phone" value="<%= user ? user.phone : '+91 98765 43210' %>" required>
+              </div>
+
+              <div class="col-12">
+                <label for="deliveryAddress" class="form-label fw-semibold">Delivery Street Address</label>
+                <textarea class="form-control" id="deliveryAddress" name="address" rows="3" required><%= user ? user.address : 'Flat 402, Sunshine Residency, High Street, Mumbai - 400001' %></textarea>
+              </div>
+
+              <div class="col-md-6">
+                <label for="landmark" class="form-label fw-semibold">Landmark (Optional)</label>
+                <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Near Apollo Pharmacy">
+              </div>
+
+              <div class="col-md-6">
+                <label for="deliveryNotes" class="form-label fw-semibold">Delivery Instructions</label>
+                <input type="text" class="form-control" id="deliveryNotes" name="notes" placeholder="e.g. Ring the bell, leave at door">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Payment Method Card -->
+          <div class="card border rounded-4 shadow-sm p-4">
+            <h4 class="fw-bold mb-3 d-flex align-items-center gap-2">
+              <span class="badge bg-danger rounded-circle p-2 fs-6">2</span> Select Payment Option
+            </h4>
+
+            <div class="d-flex flex-column gap-3">
+              <!-- Payment Option 1: Cash on Delivery -->
+              <label class="p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer bg-light">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input mt-0" type="radio" name="paymentMethod" value="Cash on Delivery" checked>
+                  <div>
+                    <strong class="d-block text-dark">Cash on Delivery (COD)</strong>
+                    <small class="text-muted">Pay in cash or UPI when your food arrives</small>
+                  </div>
+                </div>
+                <i class="bi bi-cash-stack fs-3 text-success"></i>
+              </label>
+
+              <!-- Payment Option 2: UPI / GPay / PhonePe -->
+              <label class="p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input mt-0" type="radio" name="paymentMethod" value="UPI / Online">
+                  <div>
+                    <strong class="d-block text-dark">Instant UPI (GPay / PhonePe / Paytm)</strong>
+                    <small class="text-muted">Fast & contactless digital checkout</small>
+                  </div>
+                </div>
+                <i class="bi bi-qr-code-scan fs-3 text-primary"></i>
+              </label>
+
+              <!-- Payment Option 3: Credit / Debit Card -->
+              <label class="p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input mt-0" type="radio" name="paymentMethod" value="Credit Card">
+                  <div>
+                    <strong class="d-block text-dark">Credit / Debit Card</strong>
+                    <small class="text-muted">Visa, MasterCard, RuPay, Amex accepted</small>
+                  </div>
+                </div>
+                <i class="bi bi-credit-card-2-front fs-3 text-dark"></i>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Order Review & Confirmation -->
+        <div class="col-lg-4">
+          <div class="order-summary-card">
+            <h4 class="fw-bold mb-3">Order Items (<%= cartItems.length %>)</h4>
+
+            <div class="d-flex flex-column gap-2 mb-3 max-h-300 overflow-auto">
+              <% cartItems.forEach(item => { %>
+                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary-subtle text-dark"><%= item.quantity %>x</span>
+                    <span class="small fw-semibold text-truncate" style="max-width: 170px;"><%= item.name %></span>
+                  </div>
+                  <span class="small fw-bold">₹<%= item.price * item.quantity %></span>
+                </div>
+              <% }) %>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Subtotal</span>
+              <span class="fw-semibold small">₹<%= summary.subtotal %></span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Delivery Charges</span>
+              <span class="fw-semibold small">
+                <% if (summary.deliveryFee === 0) { %>
+                  <span class="text-success">FREE</span>
+                <% } else { %>
+                  ₹<%= summary.deliveryFee %>
+                <% } %>
+              </span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">GST (5%)</span>
+              <span class="fw-semibold small">₹<%= summary.tax %></span>
+            </div>
+            <% if (summary.discount > 0) { %>
+              <div class="d-flex justify-content-between mb-2 text-success">
+                <span class="small">Coupon Discount</span>
+                <span class="fw-semibold small">-₹<%= summary.discount %></span>
+              </div>
+            <% } %>
+
+            <hr class="my-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <span class="fw-bold fs-5 text-dark">Total Amount</span>
+                <small class="d-block text-muted">Estimated time: 30 mins</small>
+              </div>
+              <span class="display-6 fw-bold text-danger">₹<%= summary.total %></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary-custom w-100 justify-content-center py-3 fs-5" id="placeOrderBtn">
+              <i class="bi bi-lock-fill"></i> Place Order Now
+            </button>
+
+            <div class="text-center mt-3">
+              <small class="text-muted">
+                <i class="bi bi-shield-check text-success me-1"></i> Safe & Encrypted Checkout
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

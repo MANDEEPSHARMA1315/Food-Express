@@ -1,0 +1,98 @@
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+  <div class="container">
+    <!-- Brand Logo -->
+    <a class="navbar-brand navbar-brand-logo" href="/" id="brandLogoLink">
+      <span class="brand-icon">
+        <i class="bi bi-fire"></i>
+      </span>
+      <span>Food<span class="text-danger">Express</span></span>
+    </a>
+
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation" id="navbarToggleBtn">
+      <i class="bi bi-list fs-2 text-dark"></i>
+    </button>
+
+    <!-- Nav Links & Actions -->
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath === '/' ? 'active' : '' %>" href="/" id="navHomeLink">
+            <i class="bi bi-house-door me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath.startsWith('/menu') ? 'active' : '' %>" href="/menu" id="navMenuLink">
+            <i class="bi bi-grid me-1"></i> Explore Menu
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath.startsWith('/orders') ? 'active' : '' %>" href="/orders" id="navOrdersLink">
+            <i class="bi bi-clock-history me-1"></i> My Orders
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= currentPath.startsWith('/orders/track') ? 'active' : '' %>" href="/orders/track" id="navTrackLink">
+            <i class="bi bi-geo-alt me-1"></i> Track Order
+          </a>
+        </li>
+      </ul>
+
+      <!-- Search in Navbar -->
+      <form action="/menu" method="GET" class="d-flex me-lg-3 my-2 my-lg-0" role="search" id="navbarSearchForm">
+        <div class="search-input-group w-100">
+          <i class="bi bi-search search-icon-inside"></i>
+          <input class="form-control" type="search" name="search" placeholder="Search burger, pizza, biryani..." aria-label="Search" id="navbarSearchInput">
+        </div>
+      </form>
+
+      <!-- Cart & User Actions -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Cart Badge Button -->
+        <a href="/cart" class="cart-btn-badge" id="navCartBtn" title="View Shopping Cart">
+          <i class="bi bi-bag"></i>
+          <span class="cart-badge-count"><%= cartCount || 3 %></span>
+        </a>
+
+        <!-- Admin Portal Shortcut (MCA Portfolio Highlight) -->
+        <a href="/admin" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-2 fw-semibold d-none d-md-inline-flex align-items-center gap-1" id="navAdminPortalBtn" title="Admin Dashboard">
+          <i class="bi bi-shield-lock-fill text-warning"></i> Admin
+        </a>
+
+        <!-- User Authentication Dropdown -->
+        <div class="dropdown">
+          <button class="btn btn-secondary-custom py-2 px-3 dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="userMenuDropdown">
+            <i class="bi bi-person-circle fs-5"></i>
+            <span class="d-none d-sm-inline"><%= currentUser ? currentUser.name : 'Account' %></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2">
+            <li><h6 class="dropdown-header text-uppercase text-muted small fw-bold">Customer Portal</h6></li>
+            <li>
+              <a class="dropdown-item rounded-3 py-2" href="/profile" id="userProfileLink">
+                <i class="bi bi-person-badge me-2 text-primary"></i> Customer Dashboard
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item rounded-3 py-2" href="/orders" id="userOrdersLink">
+                <i class="bi bi-bag-check me-2 text-primary"></i> Previous Orders
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header text-uppercase text-muted small fw-bold">Management</h6></li>
+            <li>
+              <a class="dropdown-item rounded-3 py-2" href="/admin" id="userAdminLink">
+                <i class="bi bi-speedometer2 me-2 text-warning"></i> Admin Dashboard
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item rounded-3 py-2 text-danger" href="/login" id="userLoginLink">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Switch / Login
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

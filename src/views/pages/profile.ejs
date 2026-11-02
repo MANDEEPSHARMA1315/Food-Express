@@ -1,0 +1,122 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<main class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <span class="text-primary fw-bold small text-uppercase">Customer Portal</span>
+        <h1 class="h2 fw-bold mb-1">My Dashboard</h1>
+      </div>
+      <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+        <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+      </a>
+    </div>
+
+    <div class="row g-4">
+      <!-- User Profile Card -->
+      <div class="col-lg-4">
+        <div class="card border rounded-4 shadow-sm p-4 text-center mb-4">
+          <div class="brand-icon mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2rem; background: linear-gradient(135deg, #ff6b35, #ff5722);">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <h4 class="fw-bold mb-1"><%= user.name %></h4>
+          <p class="text-muted small mb-2"><%= user.email %></p>
+          <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-3">Premium Foodie</span>
+
+          <div class="text-start border-top pt-3 mt-2">
+            <div class="mb-2 small">
+              <span class="text-muted d-block">Phone:</span>
+              <strong class="text-dark"><%= user.phone %></strong>
+            </div>
+            <div class="mb-2 small">
+              <span class="text-muted d-block">Saved Delivery Address:</span>
+              <strong class="text-dark"><%= user.address %></strong>
+            </div>
+            <div class="small">
+              <span class="text-muted d-block">Member Since:</span>
+              <strong class="text-dark"><%= user.memberSince %></strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Help Card -->
+        <div class="card border rounded-4 shadow-sm p-4 bg-light">
+          <h5 class="fw-bold mb-2">Need Assistance?</h5>
+          <p class="small text-muted mb-3">Our 24x7 customer support helpline is available for any queries with your food or delivery.</p>
+          <a href="#" class="btn btn-outline-dark btn-sm rounded-pill w-100"><i class="bi bi-headset me-1"></i> Contact Support</a>
+        </div>
+      </div>
+
+      <!-- Main Column: Active Order & Order History -->
+      <div class="col-lg-8">
+        <!-- Live Active Order Highlight -->
+        <div class="card border-0 rounded-4 shadow-sm p-4 mb-4 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-2">LIVE ORDER IN PROGRESS</span>
+              <h4 class="fw-bold mb-1 text-white">Order #FE-8921</h4>
+              <p class="text-secondary-subtle small mb-0">Status: <span class="text-warning fw-bold">Out for Delivery (Rider Ramesh Verma)</span></p>
+            </div>
+            <a href="/orders/track/FE-8921" class="btn btn-primary-custom btn-sm">
+              <i class="bi bi-geo-alt-fill"></i> Track Live
+            </a>
+          </div>
+          <div class="progress" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <small class="d-block mt-2 text-secondary-subtle">Estimated arrival at your door in approximately 12-15 minutes.</small>
+        </div>
+
+        <!-- Recent Orders Card -->
+        <div class="card border rounded-4 shadow-sm overflow-hidden">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">Previous Orders</h5>
+            <a href="/orders" class="small text-danger fw-bold text-decoration-none">View All Orders</a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentOrders.forEach(order => { %>
+                  <tr>
+                    <td><strong class="text-dark">#<%= order.id %></strong></td>
+                    <td><small class="text-muted"><%= order.date %></small></td>
+                    <td>
+                      <span class="small text-truncate d-inline-block" style="max-width: 180px;">
+                        <%= order.items.map(i => i.name + ' (' + i.qty + ')').join(', ') %>
+                      </span>
+                    </td>
+                    <td><strong class="text-dark">₹<%= order.total %></strong></td>
+                    <td>
+                      <span class="badge bg-<%= order.statusColor %>-subtle text-<%= order.statusColor %> rounded-pill px-2 py-1">
+                        <%= order.status %>
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="/orders/track/<%= order.id %>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                        Track
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

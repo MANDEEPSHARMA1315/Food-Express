@@ -1,0 +1,71 @@
+services:
+  # ----------------------------------------------------------------------------
+  # Service 1: FoodExpress Node.js Web Application
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: foodexpress_web_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_NAME=FoodExpress
+      - APP_URL=http://localhost:3000
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=foodexpress
+      - DB_PORT=3306
+      - SESSION_SECRET=foodexpress_production_secure_key_2026
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - foodexpress_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ----------------------------------------------------------------------------
+  # Service 2: MySQL 8.0 Enterprise Database
+  # (Not exposed to the public host in production for maximum isolation)
+  # ----------------------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: foodexpress_mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: foodexpress
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/config/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    networks:
+      - foodexpress_network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -prootpassword || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes
+# ------------------------------------------------------------------------------
+volumes:
+  mysql_data:
+    driver: local
+
+# ------------------------------------------------------------------------------
+# Isolated Bridge Network
+# ------------------------------------------------------------------------------
+networks:
+  foodexpress_network:
+    driver: bridge

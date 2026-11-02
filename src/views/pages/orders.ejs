@@ -1,0 +1,78 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<main class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <span class="text-primary fw-bold small text-uppercase">Order Archives</span>
+        <h1 class="h2 fw-bold mb-1">My Orders</h1>
+        <p class="text-muted mb-0">Track live orders or view receipt details of past orders.</p>
+      </div>
+      <a href="/menu" class="btn btn-primary-custom">
+        <i class="bi bi-plus-lg me-1"></i> Order More Food
+      </a>
+    </div>
+
+    <div class="d-flex flex-column gap-4">
+      <% orders.forEach(order => { %>
+        <div class="card border rounded-4 shadow-sm overflow-hidden" id="orderCard-<%= order.id %>">
+          <!-- Order Card Header -->
+          <div class="card-header bg-light py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-dark rounded-pill px-3 py-2 fw-bold fs-6">#<%= order.id %></span>
+              <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> Ordered on: <%= order.date %></small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-<%= order.statusColor %>-subtle text-<%= order.statusColor %> rounded-pill px-3 py-2 fw-bold">
+                <i class="bi bi-dot"></i> <%= order.status %>
+              </span>
+              <a href="/orders/track/<%= order.id %>" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">
+                <i class="bi bi-geo-alt-fill me-1"></i> Track Order
+              </a>
+            </div>
+          </div>
+
+          <!-- Order Card Body -->
+          <div class="card-body p-4">
+            <div class="row g-4 align-items-center">
+              <div class="col-lg-7">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Items Ordered (<%= order.itemCount %>)</h6>
+                <div class="d-flex flex-column gap-2">
+                  <% order.items.forEach(item => { %>
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark border"><%= item.qty %>x</span>
+                        <span class="fw-semibold text-dark"><%= item.name %></span>
+                      </div>
+                      <span class="text-muted small">₹<%= item.price * item.qty %></span>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+
+              <div class="col-lg-5 border-start-lg">
+                <div class="p-3 bg-light rounded-3">
+                  <div class="d-flex justify-content-between mb-1 small">
+                    <span class="text-muted">Payment:</span>
+                    <strong><%= order.paymentMethod %></strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1 small">
+                    <span class="text-muted">Delivery Address:</span>
+                    <span class="text-truncate text-end ms-2" style="max-width: 220px;"><%= order.deliveryAddress %></span>
+                  </div>
+                  <div class="d-flex justify-content-between mt-2 pt-2 border-top">
+                    <strong class="fs-6">Total Amount:</strong>
+                    <strong class="fs-5 text-danger">₹<%= order.total %></strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
